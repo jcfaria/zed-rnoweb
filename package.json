@@ -1,0 +1,17 @@
+{
+  "name": "tree-sitter-sweave",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for Sweave/knitr (.Rnw) files",
+  "scripts": {
+    "clean-zed-grammar": "node -e \"require('fs').rmSync('grammars/sweave',{recursive:true,force:true}); console.log('Removed grammars/sweave (if it existed).');\""
+  },
+  "main": "bindings/node",
+  "keywords": ["tree-sitter", "sweave", "knitr", "r", "latex"],
+  "license": "MIT",
+  "tree-sitter": [
+    {
+      "scope": "source.sweave",
+      "file-types": ["Rnw", "rnw", "Snw", "snw"]
+    }
+  ]
+}

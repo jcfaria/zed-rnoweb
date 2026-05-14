@@ -1,0 +1,35 @@
+# =============================================================================
+# Zed extension build artefacts
+# =============================================================================
+
+# Compiled extension binary (Rust-based extensions only; not used here)
+extension.wasm
+
+# Zed clones the grammar repository here during dev extension compilation.
+# This directory is managed by Zed — do not track it in git.
+grammars/sweave/
+
+# Intermediate WASM compiled locally for reference (not used by Zed)
+grammars/sweave.wasm
+
+# Local tree-sitter build output at repo root (not used by Zed dev extension path)
+/tree-sitter-sweave.wasm
+
+# =============================================================================
+# Local-only test fixtures (keep on disk, do not publish)
+# =============================================================================
+/tests/rl_ajustamento.R
+/tests/DEX083-2-pratica.tex
+
+# =============================================================================
+# OS artefacts
+# =============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Editor artefacts
+# =============================================================================
+*.swp
+*~

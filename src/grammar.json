@@ -1,0 +1,105 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
+  "name": "sweave",
+  "rules": {
+    "source_file": {
+      "type": "REPEAT",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "code_chunk"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "text_line"
+          }
+        ]
+      }
+    },
+    "code_chunk": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "chunk_header"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "chunk_body"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "chunk_end"
+        }
+      ]
+    },
+    "chunk_body": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SYMBOL",
+        "name": "r_line"
+      }
+    },
+    "chunk_header": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "PATTERN",
+          "value": "<<[^\\n]*>>=[ \\t]*\\n"
+        }
+      }
+    },
+    "r_line": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "PATTERN",
+          "value": "[^@\\n][^\\n]*\\n|\\n"
+        }
+      }
+    },
+    "chunk_end": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "PATTERN",
+          "value": "@[^\\n]*\\n?"
+        }
+      }
+    },
+    "text_line": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 0,
+        "content": {
+          "type": "PATTERN",
+          "value": "[^\\n]*\\n|[^\\n]+"
+        }
+      }
+    }
+  },
+  "extras": [],
+  "conflicts": [],
+  "precedences": [],
+  "externals": [],
+  "inline": [],
+  "supertypes": [],
+  "reserved": {}
+}

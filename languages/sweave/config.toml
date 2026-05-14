@@ -1,0 +1,22 @@
+# Language configuration for Sweave / knitr (.Rnw) files.
+#
+# Uses the custom Sweave Tree-sitter grammar which understands:
+#   <<label, options>>=  ...  @
+# and exposes chunk_body (R) and text_line (LaTeX) for injection.
+
+name          = "Sweave"
+grammar       = "sweave"
+path_suffixes = ["Rnw", "rnw", "Snw", "snw"]
+line_comments = ["% "]
+
+tab_size = 2
+
+autoclose_before = "$}]'\\"
+
+brackets = [
+    { start = "{", end = "}",  close = true,  newline = false, not_in = ["comment"] },
+    { start = "[", end = "]",  close = true,  newline = false, not_in = ["comment"] },
+    { start = "(", end = ")",  close = true,  newline = false },
+    { start = "$", end = "$",  close = true,  newline = false, not_in = ["math", "comment"] },
+    { start = "`", end = "'",  close = true,  newline = false, not_in = ["math", "comment"] },
+]

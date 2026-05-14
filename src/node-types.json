@@ -1,0 +1,76 @@
+[
+  {
+    "type": "chunk_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "r_line",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "code_chunk",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "chunk_body",
+          "named": true
+        },
+        {
+          "type": "chunk_end",
+          "named": true
+        },
+        {
+          "type": "chunk_header",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "code_chunk",
+          "named": true
+        },
+        {
+          "type": "text_line",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "chunk_end",
+    "named": true
+  },
+  {
+    "type": "chunk_header",
+    "named": true
+  },
+  {
+    "type": "r_line",
+    "named": true
+  },
+  {
+    "type": "text_line",
+    "named": true
+  }
+]

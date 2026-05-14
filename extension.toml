@@ -1,0 +1,21 @@
+id             = "sweave"
+name           = "Sweave"
+version        = "0.3.2"
+schema_version = 1
+authors        = ["José C. Faria <joseclaudio.faria@gmail.com>"]
+description    = """
+Sweave / knitr (.Rnw) language support for Zed.
+
+Requires the official Zed extensions "LaTeX" and "R" (marketplace): this
+extension injects those parsers for prose and chunk bodies.
+
+Provides LaTeX highlighting outside chunks and R highlighting inside <<...>>=
+blocks via a Tree-sitter wrapper grammar. Each R chunk is injected separately;
+consecutive LaTeX lines are merged for the LaTeX parser.
+"""
+repository = "https://github.com/jcfaria/zed-rnoweb.git"
+languages  = ["languages/sweave"]
+
+[grammars.sweave]
+repository = "https://github.com/jcfaria/zed-rnoweb.git"
+commit     = "main"

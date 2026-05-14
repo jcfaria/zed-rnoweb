@@ -1,0 +1,23 @@
+{
+  "grammars": [
+    {
+      "name": "sweave",
+      "scope": "source.sweave",
+      "path": ".",
+      "file-types": ["Rnw", "rnw", "Snw", "snw"],
+      "highlights": "languages/sweave/highlights.scm",
+      "injections": "languages/sweave/injections.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "description": "Tree-sitter grammar for Sweave/knitr (.Rnw) files",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "José C. Faria",
+        "email": "joseclaudio.faria@gmail.com"
+      }
+    ]
+  }
+}
