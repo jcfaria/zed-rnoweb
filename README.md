@@ -27,8 +27,66 @@ Zed highlights through **Tree-sitter** and **injections**. Where possible, this 
 | LaTeX outside chunks | Via **[LaTeX](https://github.com/rzukic/zed-latex)** injection |
 | R inside chunks | Via **[R](https://github.com/ocsmit/zed-r)** injection |
 | Bracket matching | From injected LaTeX / R grammars |
+| Chunk background colour | Optional — requires one-time `settings.json` entry (see below) |
 
 Everything below that refers to **requirements**, **dev install**, and **troubleshooting** applies to this **Sweave** layer unless noted otherwise.
+
+---
+
+## Chunk background colour
+
+The extension tags every R code chunk with the custom syntax scope **`r-chunk`**.
+By itself this scope is invisible; you activate it by adding a `theme_overrides`
+entry to your Zed `settings.json` (`zed: open settings file`).
+
+### Activating the background
+
+Add the block below, replacing the theme names with the ones you actually use
+(check `"theme"` → `"dark"` / `"light"` in your settings):
+
+```jsonc
+"theme_overrides": {
+  // Dark theme example
+  "One Dark": {
+    "syntax": {
+      "r-chunk": { "background_color": "#363a45" }
+    }
+  },
+  // Light theme example
+  "One Light": {
+    "syntax": {
+      "r-chunk": { "background_color": "#f0ede4" }
+    }
+  }
+},
+```
+
+The colour applies to the entire chunk node — header (`<<…>>=`), body, and
+closing `@` — while LaTeX prose keeps the editor's default background.
+
+### Choosing a colour
+
+A good starting point is a shade that is **close but distinct** from your
+editor background:
+
+| Theme | Editor background | Suggested `r-chunk` background |
+|-------|------------------|--------------------------------|
+| One Dark | `#282c34` | `#363a45` (lighter cool grey) |
+| One Light | `#fafafa` | `#f0ede4` (warm off-white) |
+
+Adjust to taste — the closer to the editor background, the subtler the effect.
+
+### Known limitation — no full-width strip
+
+Zed currently applies `background_color` **only to the text characters**
+within the matched range; the colour does not extend to the right edge of the
+editor window as a continuous strip (the RStudio-style panel effect).
+
+This is a Zed core limitation tracked in
+[zed-industries/zed #7336](https://github.com/zed-industries/zed/issues/7336)
+(closed, not currently scheduled). When Zed eventually adds full-width block
+background support, the `r-chunk` scope already in place will work
+automatically — no change to this extension will be needed.
 
 ---
 
@@ -125,9 +183,10 @@ Grammar builds target **64-bit Windows (x86_64)** via WASI SDK. Other Windows ta
 ## Roadmap
 
 - [x] Sweave / knitr `.Rnw` — Tree-sitter wrapper + LaTeX / R injections  
+- [x] **Chunk background** — `r-chunk` scope + `theme_overrides` (partial: text-area only; full-width pending Zed core, see [#7336](https://github.com/zed-industries/zed/issues/7336))  
 - [ ] **Markdown + R** (`.Rmd`, `.qmd`, …) — fenced chunks, reuse Markdown + R extensions  
 - [ ] **HTML + R** and other host formats where there is a clear chunk model  
-- [ ] **Chunk chrome** — consistent visual separation (background / border / dedicated highlight scopes + optional companion theme snippets) across user themes  
+- [ ] **Chunk chrome** — full-width background strip once Zed core adds block-level background support  
 - [ ] **Workflow** — send to R, knitr/Quarto-oriented tooling, LSP where feasible  
 - [ ] **Registry** — submit / maintain listing in the Zed extension catalog  
 
