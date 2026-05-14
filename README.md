@@ -1,123 +1,106 @@
-# Sweave — Zed Extension
+# Literate R & noweb-style chunks - Zed extension
 
-Zed language extension for **Sweave / knitr** (`.Rnw`) files — LaTeX with
-embedded R chunks delimited by `<<...>>=` … `@`.
+This repository hosts a **Zed extension** aimed at **literate programming with R**: documents that mix a **host language** (LaTeX, Markdown, HTML, …) with **delimited R code chunks**. The long-term idea is one coherent experience across formats such as **`.Rnw`**, **`.Rmd`**, **`.qmd`**, and similar, not only a single file type.
+
+Zed highlights through **Tree-sitter** and **injections**. Where possible, this project **reuses** parsers and queries from existing Zed extensions (LaTeX, Markdown, R, …) so you get **full syntax** in prose and in chunk bodies—as long as those base extensions are installed and enabled.
+
+---
+
+## Vision & goals
+
+| Goal | Description |
+|------|-------------|
+| **Chunk boundaries** | Reliable recognition of **opening and closing** chunk markers across host formats (Sweave `<<…>>=` … `@`, knitr/Quarto-style **Markdown** fenced blocks, HTML-oriented engines, etc.). |
+| **Composed highlighting** | With the right **host** + **R** extensions installed, the buffer should read like a normal `.tex` / `.md` / … file **plus** R inside chunks—not a flat single grammar. |
+| **Readable chunks in any theme** | Chunks should **visually stand out** (background, border, or dedicated scopes) in a predictable way, without depending on each user’s theme choices alone. *(Design target; see roadmap.)* |
+| **Later** | Optional workflow features (e.g. **send code to R**, knitr/Quarto-aware tooling, LSP wiring) once the language layers are solid. |
+
+---
+
+## Current scope (what works today)
+
+**Implemented now:** **Sweave / knitr LaTeX + R** (`.Rnw`, `.rnw`, `.Snw`, `.snw`) with `<<label, options>>=` … `@` chunks.
+
+| Feature | Status |
+|--------|--------|
+| Chunk delimiters (`<<…>>=` / `@`) | Supported (Sweave Tree-sitter + `highlights.scm`) |
+| LaTeX outside chunks | Via **[LaTeX](https://github.com/rzukic/zed-latex)** injection |
+| R inside chunks | Via **[R](https://github.com/ocsmit/zed-r)** injection |
+| Bracket matching | From injected LaTeX / R grammars |
+
+Everything below that refers to **requirements**, **dev install**, and **troubleshooting** applies to this **Sweave** layer unless noted otherwise.
+
+---
 
 ## Requirements (read this first)
 
-Highlighting **depends on two other extensions** from the Zed marketplace:
+Highlighting **depends on two marketplace extensions**:
 
-1. **[LaTeX](https://github.com/rzukic/zed-latex)** — provides the `LaTeX` parser used for prose lines.
-2. **[R](https://github.com/ocsmit/zed-r)** — provides the `R` parser used inside code chunks.
+1. **[LaTeX](https://github.com/rzukic/zed-latex)** — parser for prose lines.  
+2. **[R](https://github.com/ocsmit/zed-r)** — parser inside R chunks.
 
-Install both, restart Zed if needed, then install this extension. Without them,
-you may see only chunk delimiters highlighted or almost no colour.
+Install both, restart Zed if needed, then install this extension. Without them, you may see only chunk delimiters highlighted.
 
 ### Only chunk delimiters are coloured (body looks plain)
 
-That means the **Sweave** layer is active (`highlights.scm` on `<<…>>=` / `@`), but
-**injected** highlighting for **R** and **LaTeX** is not being applied.
+The Sweave layer is active, but **injected** LaTeX/R highlighting is not applied.
 
-1. **Confirm the other languages work on their own** — open a `.R` and a `.tex`
-   file. If those buffers are also mostly unstyled, fix or reinstall the **R**
-   and **LaTeX** extensions first; Sweave cannot inject parsers that are not
-   loaded.
-2. In **Extensions**, ensure **R** and **LaTeX** are installed **and** enabled
-   (not disabled). Restart Zed after enabling them, then reinstall the Sweave
-   dev extension if you use one.
-3. In `settings.json`, do **not** map `Rnw` / `rnw` to **LaTeX** under
-   `file_types` — that forces the whole file to the LaTeX grammar and bypasses
-   Sweave (and its injections).
-4. After changing `languages/sweave/injections.scm`, run **Install dev
-   extension** again on this folder (or reload the window) so Zed picks up the
-   new queries.
+1. Open a `.R` and a `.tex` file; if those are also dull, fix **R** and **LaTeX** first.  
+2. In **Extensions**, ensure **R** and **LaTeX** are installed **and** enabled; restart Zed; reinstall this dev extension if you use one.  
+3. In `settings.json`, do **not** map `Rnw` / `rnw` to **LaTeX** under `file_types`—that forces the whole buffer to LaTeX and **bypasses** Sweave.  
+4. After editing `languages/sweave/injections.scm`, run **zed: install dev extension** again (or reload the window).
 
-If problems persist, use **zed: open log** and search for messages about
-`grammar`, `language`, `Sweave`, `R`, or `LaTeX` around the time you open an
-`.Rnw` file.
+If it still fails, use **zed: open log** and search for `grammar`, `language`, `Sweave`, `R`, or `LaTeX` when opening an `.Rnw` file.
 
-## Current status
-
-| Feature | Status |
-|---|---|
-| LaTeX highlighting (prose) | ✅ Via LaTeX extension injection |
-| R highlighting in `<<>>=` chunks | ✅ Via R extension injection |
-| Chunk header / `@` highlighting | ✅ Sweave `highlights.scm` |
-| Bracket matching | ✅ From injected LaTeX / R grammars |
+---
 
 ## Why injections?
 
-Zed highlights via **Tree-sitter**. Sweave mixes LaTeX and R; this repo ships a
-small wrapper grammar plus `injections.scm` so Zed reuses the same parsers as
-`.tex` and `.R` files.
+Sweave mixes **LaTeX** and **R**. This repo ships a **small wrapper grammar** plus `injections.scm` so Zed can reuse the same parsers and highlight rules as standalone `.tex` and `.R` buffers—the same pattern we intend to follow for other hosts (Markdown, HTML, …) as they are added.
 
-## Project Structure
+---
+
+## Project structure
 
 ```
 zed-rnoweb/
-├── grammar.js              # Tree-sitter grammar source
+├── grammar.js              # Tree-sitter grammar source (Sweave)
 ├── src/                    # Generated parser (tree-sitter generate)
 ├── languages/sweave/
-│   ├── config.toml         # Language configuration
-│   ├── highlights.scm      # Syntax highlight queries
-│   └── injections.scm      # R / LaTeX injection queries
+│   ├── config.toml         # Language id, file suffixes, brackets
+│   ├── highlights.scm      # Chunk delimiter highlights
+│   └── injections.scm      # LaTeX / R injection queries
 ├── tests/
-│   └── latex_fdt.Rnw       # Test file for grammar development
+│   └── latex_fdt.Rnw       # Sample .Rnw for grammar work
 ├── package.json
 ├── tree-sitter.json
 └── extension.toml
 ```
 
+---
+
 ## Installation (dev)
 
-1. Install the **LaTeX** and **R** extensions from the Zed Extensions panel.
-2. Clone this repository (or use your existing copy).
-3. Command palette → **zed: install dev extension** → choose this folder
-   (the directory that contains `extension.toml`).
+1. Install **LaTeX** and **R** from the Zed Extensions panel.  
+2. Clone this repository.  
+3. Command palette → **zed: install dev extension** → choose the folder that contains `extension.toml`.
 
-Zed will download a WASI SDK and compile the Tree-sitter grammar on first load
-(needs network once). If installation fails, open **zed: open log** or run
-`zed --foreground` from a terminal and look for `grammar` / `clang` / `wasi-sdk`
-errors.
+On first load Zed may download a **WASI SDK** and compile the grammar (network once). On failure, check **zed: open log** or run `zed --foreground` for `grammar` / `clang` / `wasi-sdk` errors.
 
-### Grammar checkout stuck or wrong revision
+### Grammar clone under the repo
 
-Zed keeps a **nested git clone** for the Tree-sitter grammar. When you install
-this folder as a **dev extension**, that clone lives next to your sources:
+Zed keeps a **nested git clone** next to your sources, e.g. `zed-rnoweb\grammars\sweave\` (not only under `%LocalAppData%\Zed\extensions\…`).
 
-`zed-rnoweb\grammars\sweave\`
+If the log shows **`grammar directory … already exists, but is not a git clone of`**, remove the stale clone and reinstall:
 
-(not only under `%LocalAppData%\Zed\extensions\…`).
+- **npm:** `npm run clean-zed-grammar`  
+- **PowerShell:** `Remove-Item -Recurse -Force .\grammars\sweave`
 
-If you see **`grammar directory … already exists, but is not a git clone of`**
-in **zed: open log**, Zed found an old `grammars\sweave` whose `origin` URL does
-not match `repository` in `extension.toml` (for example you switched between
-`https://…` and `file:///…`, or the folder was half-created). Fix:
+After a good build you should see `grammars\sweave\.git` and `grammars\sweave.wasm`; both are gitignored and must not be committed.
 
-1. Quit Zed (optional but avoids file locks).
-2. From the repo root, remove the clone, then reinstall the dev extension:
-   - **npm:** `npm run clean-zed-grammar`
-   - **PowerShell:** `Remove-Item -Recurse -Force .\grammars\sweave`
+### Unpublished grammar edits (`file://`)
 
-After a successful build you should see `grammars\sweave\.git` and
-`grammars\sweave.wasm`; both are listed in `.gitignore` and must not be
-committed.
-
-### Log noise that is *not* this extension
-
-- **`unknown variant 'write'`** (agent / thread): Zed Agent protocol mismatch;
-  unrelated to Sweave highlighting.
-- **`language not found`** (`acp_thread`): often the Agent / diff path when no
-  buffer language is bound; unrelated to the grammar WASM build.
-- **`failed to load language Sweave: no such grammar sweave`**: usually means
-  the grammar step above failed earlier; fix the clone + reinstall dev
-  extension, then restart Zed.
-
-### Developing the grammar without pushing to GitHub
-
-`extension.toml` uses `commit = "main"` against this repository so installs
-track the default branch. To test **unpublished** `grammar.js` / `src/`
-changes, temporarily point the grammar entry at your working tree:
+To test local `grammar.js` / `src/` before pushing, you can temporarily point the grammar at your working tree in `extension.toml`:
 
 ```toml
 [grammars.sweave]
@@ -125,23 +108,30 @@ repository = "file:///C:/Users/you/Documents/GitHub/zed-rnoweb"
 commit     = "HEAD"
 ```
 
-Use three slashes after `file:` on Windows (`file:///C:/...`). Revert to the
-HTTPS URL + `main` before publishing or opening a PR to the extensions index.
+On Windows use **three** slashes after `file:` (`file:///C:/...`). Switch back to the HTTPS URL + `main` before publishing or opening a PR to the extension index.
+
+### Log noise that is usually unrelated
+
+- **`unknown variant 'write'`** — Agent protocol noise.  
+- **`language not found`** (`acp_thread`) — often Agent/diff without a buffer language.  
+- **`failed to load language Sweave: no such grammar sweave`** — grammar build/clone failed earlier; fix `grammars/sweave` and reinstall the dev extension.
 
 ### Windows
 
-Grammar compilation is supported on **64-bit Windows** (x86_64) via WASI SDK.
-Other Windows targets may not be supported by Zed’s extension builder yet.
+Grammar builds target **64-bit Windows (x86_64)** via WASI SDK. Other Windows targets may not be supported by Zed’s builder yet.
 
-## File extensions handled
-
-`.Rnw`, `.rnw`, `.Snw`, `.snw`
+---
 
 ## Roadmap
 
-- [x] Tree-sitter wrapper grammar + LaTeX / R injections
-- [ ] Optional: language server wiring (e.g. knitr-aware tooling)
-- [ ] Submit / maintain listing in the Zed extension registry
+- [x] Sweave / knitr `.Rnw` — Tree-sitter wrapper + LaTeX / R injections  
+- [ ] **Markdown + R** (`.Rmd`, `.qmd`, …) — fenced chunks, reuse Markdown + R extensions  
+- [ ] **HTML + R** and other host formats where there is a clear chunk model  
+- [ ] **Chunk chrome** — consistent visual separation (background / border / dedicated highlight scopes + optional companion theme snippets) across user themes  
+- [ ] **Workflow** — send to R, knitr/Quarto-oriented tooling, LSP where feasible  
+- [ ] **Registry** — submit / maintain listing in the Zed extension catalog  
+
+---
 
 ## Authors
 
